@@ -6,12 +6,26 @@ const { GoogleGenAI } = require('@google/genai');
 dotenv.config();
 const app = express();
 
-// 🛠️ Vercel & Production Friendly CORS Settings
+// 🛠️ Vercel & Production Friendly CORS Settings (Enhanced for Vercel Serverless)
 app.use(cors({
-    origin: '*', // Yeh har tarah ke frontend link ko connect hone ki ijaazat deta hai
+    origin: '*', 
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Manual CORS fallback configuration specifically for Vercel routing
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    // Handle browser preflight OPTIONS request immediately
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    next();
+});
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
