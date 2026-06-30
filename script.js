@@ -60,88 +60,89 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const playVideoBtn = document.getElementById("playVideoBtn");
-const portfolioVideo = document.getElementById("portfolioVideo");
-const videoCardContainer = document.getElementById("videoCardContainer");
+    const portfolioVideo = document.getElementById("portfolioVideo");
+    const videoCardContainer = document.getElementById("videoCardContainer");
 
-if (playVideoBtn && portfolioVideo && videoCardContainer) {
-    playVideoBtn.addEventListener("click", function(e) {
-        e.preventDefault(); 
-        videoCardContainer.classList.add("video-playing");
-        portfolioVideo.play();
-    });
-    portfolioVideo.addEventListener("pause", function() { videoCardContainer.classList.remove("video-playing"); });
-    portfolioVideo.addEventListener("ended", function() { videoCardContainer.classList.remove("video-playing"); });
-}  
+    if (playVideoBtn && portfolioVideo && videoCardContainer) {
+        playVideoBtn.addEventListener("click", function(e) {
+            e.preventDefault(); 
+            videoCardContainer.classList.add("video-playing");
+            portfolioVideo.play();
+        });
+        portfolioVideo.addEventListener("pause", function() { videoCardContainer.classList.remove("video-playing"); });
+        portfolioVideo.addEventListener("ended", function() { videoCardContainer.classList.remove("video-playing"); });
+    }  
 
-const viewMoreBtn = document.getElementById("viewMoreBtn");
-const extraProjects = document.querySelector(".extra-projects");
-if (viewMoreBtn && extraProjects) {
-    viewMoreBtn.addEventListener("click", function() {
-        extraProjects.classList.toggle("show-grid");
-        if (extraProjects.classList.contains("show-grid")) {
-            viewMoreBtn.textContent = "View Less";
-            const newCards = extraProjects.querySelectorAll(".project-card");
-            newCards.forEach((card, index) => {
-                card.style.animation = `slideFromBottom 0.6s cubic-bezier(0.25, 1, 0.5, 1) ${index * 0.15}s both`;
-            });
-        } else {
-            viewMoreBtn.textContent = "View More";
-        }
-    });
-} 
-
-// --- Strict Scroll-Trigger Animation Controller Engine ---
-const scrollRevealConfig = { root: null, threshold: 0.15, rootMargin: "0px" }; 
-const scrollObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-            
-            // Counters/Numbers animation logic
-            if(entry.target.querySelector('.counter')) {
-                const counters = entry.target.querySelectorAll('.counter');
-                counters.forEach(counter => {
-                    counter.classList.remove('animating'); 
-                    runCounterAnimation(counter); 
+    const viewMoreBtn = document.getElementById("viewMoreBtn");
+    const extraProjects = document.querySelector(".extra-projects");
+    if (viewMoreBtn && extraProjects) {
+        viewMoreBtn.addEventListener("click", function() {
+            extraProjects.classList.toggle("show-grid");
+            if (extraProjects.classList.contains("show-grid")) {
+                viewMoreBtn.textContent = "View Less";
+                const newCards = extraProjects.querySelectorAll(".project-card");
+                newCards.forEach((card, index) => {
+                    card.style.animation = `slideFromBottom 0.6s cubic-bezier(0.25, 1, 0.5, 1) ${index * 0.15}s both`;
                 });
+            } else {
+                viewMoreBtn.textContent = "View More";
             }
-        } else {
-            // Jab user section se door scroll kare, toh active class hata dein
-            // Taake jab user Home se dobara niche aaye, toh animation phir se smoothly chale!
-            entry.target.classList.remove('active');
-        }
-    });
-}, scrollRevealConfig);
+        });
+    } 
 
-const heroContent = document.querySelector('.hero-content');
-if (heroContent) {
-    setTimeout(() => { heroContent.classList.add('active'); }, 200);
-}
+    // --- Strict Scroll-Trigger Animation Controller Engine ---
+    const scrollRevealConfig = { root: null, threshold: 0.15, rootMargin: "0px" }; 
+    const scrollObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                
+                // Counters/Numbers animation logic
+                if(entry.target.querySelector('.counter')) {
+                    const counters = entry.target.querySelectorAll('.counter');
+                    counters.forEach(counter => {
+                        counter.classList.remove('animating'); 
+                        runCounterAnimation(counter); 
+                    });
+                }
+            } else {
+                // Jab user section se door scroll kare, toh active class hata dein
+                // Taake jab user Home se dobara niche aaye, toh animation phir se smoothly chale!
+                entry.target.classList.remove('active');
+            }
+        });
+    }, scrollRevealConfig);
 
-const revealElements = document.querySelectorAll('.scroll-reveal');
-revealElements.forEach(element => scrollObserver.observe(element));
+    const heroContent = document.querySelector('.hero-content');
+    if (heroContent) {
+        setTimeout(() => { heroContent.classList.add('active'); }, 200);
+    }
 
-function runCounterAnimation(counterElement) {
-    if (counterElement.classList.contains('animating')) return;
-    counterElement.classList.add('animating');
-    
-    const targetValue = parseInt(counterElement.getAttribute('data-target'), 10);
-    let currentCount = 0;
-    const duration = 2000; 
-    const frameRate = 1000 / 60; 
-    const stepIncrement = targetValue / (duration / frameRate);
+    const revealElements = document.querySelectorAll('.scroll-reveal');
+    revealElements.forEach(element => scrollObserver.observe(element));
 
-    const counterTimer = setInterval(() => {
-        currentCount += stepIncrement;
-        if (currentCount >= targetValue) {
-            counterElement.textContent = targetValue;
-            counterElement.classList.remove('animating');
-            clearInterval(counterTimer);
-        } else {
-            counterElement.textContent = Math.floor(currentCount);
-        }
-    }, frameRate);
-}
+    function runCounterAnimation(counterElement) {
+        if (counterElement.classList.contains('animating')) return;
+        counterElement.classList.add('animating');
+        
+        const targetValue = parseInt(counterElement.getAttribute('data-target'), 10);
+        let currentCount = 0;
+        const duration = 2000; 
+        const frameRate = 1000 / 60; 
+        const stepIncrement = targetValue / (duration / frameRate);
+
+        const counterTimer = setInterval(() => {
+            currentCount += stepIncrement;
+            if (currentCount >= targetValue) {
+                counterElement.textContent = targetValue;
+                counterElement.classList.remove('animating');
+                clearInterval(counterTimer);
+            } else {
+                counterElement.textContent = Math.floor(currentCount);
+            }
+        }, frameRate);
+    }
+
     // --- Live EmailJS Backend Processing Engine ---
     const contactForm = document.getElementById('portfolio-form');
     if (contactForm) {
@@ -255,7 +256,8 @@ function runCounterAnimation(counterElement) {
             chatWindow.scrollTop = chatWindow.scrollHeight;
 
             try {
-                const response = await fetch('http://localhost:5000/api/message', {
+                // LIVE VERCEL BACKEND LINK FOR CHAT
+                const response = await fetch('https://my-portfolio-gamma-nine-umqhavvc2.vercel.app/api/message', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: messageText })
@@ -374,7 +376,8 @@ function runCounterAnimation(counterElement) {
             if (callLoadingDots) callLoadingDots.style.display = 'inline-flex';
 
             try {
-                const response = await fetch('http://localhost:5000/api/voice-agent', {
+                // LIVE VERCEL BACKEND LINK FOR VOICE AGENT
+                const response = await fetch('https://my-portfolio-gamma-nine-umqhavvc2.vercel.app/api/voice-agent', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userText: finalTranscript })
