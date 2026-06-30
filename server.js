@@ -6,11 +6,15 @@ const { GoogleGenAI } = require('@google/genai');
 dotenv.config();
 const app = express();
 
-// 🛠️ FIX 1: Online servers (Render) ke mutabiq Port set kiya
-const PORT = process.env.PORT || 5000;
-
-app.use(cors());
+// 🛠️ Vercel & Production Friendly CORS Settings
+app.use(cors({
+    origin: '*', // Yeh har tarah ke frontend link ko connect hone ki ijaazat deta hai
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
+
+const PORT = process.env.PORT || 5000;
 
 // 🔑 Array of API Keys
 const apiKeys = [
@@ -23,7 +27,6 @@ const apiKeys = [
 let currentKeyIndex = 0;
 
 function getAIInstance() {
-    // 🛠️ FIX 2: Safely ensure index stays within bounds
     if (currentKeyIndex >= apiKeys.length || currentKeyIndex < 0) {
         currentKeyIndex = 0; 
     }
@@ -31,7 +34,7 @@ function getAIInstance() {
     return new GoogleGenAI({ apiKey: activeKey });
 }
 
-// 🧠 INJECTED BRAIN: Portfolio Rules & Knowledge Base (Bilkul Unchanged)
+// 🧠 INJECTED BRAIN: Portfolio Rules & Knowledge Base (Unchanged)
 const ariaSystemInstruction = 
 `You are Aria, the brilliant, confident, and highly skilled AI Voice & Chat Assistant of Amara. 
  Your job is to represent Amara to potential clients. You must strictly follow this master 
@@ -89,6 +92,11 @@ const ariaSystemInstruction =
      * LinkedIn: Name is Eman eman (Link: https://www.linkedin.com/in/eman-eman-b31136400?utm_source=share_via&utm_content=profile&utm_medium=member_android)
    - Always maintain Aria's confident, helpful tone while sharing these details.`
 ;
+
+// Welcome root to avoid 404 on home path
+app.get('/', (req, res) => {
+    res.send("Aria AI Server is running perfectly on Vercel!");
+});
 
 // 💬 1. CHAT MODE ROUTE
 app.post('/api/message', async (req, res) => {
@@ -154,7 +162,12 @@ app.post('/api/voice-agent', async (req, res) => {
     res.json({ reply: "My daily limit is full. Please message Amara via the contact form below!" });
 });
 
-// 🛠️ FIX 1 Continued: Listen using PORT variable
-app.listen(PORT, () => {
-    console.log(`🚀 All-in-One Premium Server Active on Port ${PORT}`);
-});
+// Only listen to port if not running as serverless function
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`🚀 All-in-One Premium Server Active on Port ${PORT}`);
+    });
+}
+
+// 🛠️ Vercel Requirement Fix
+module.exports = app;
