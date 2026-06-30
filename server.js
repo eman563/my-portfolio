@@ -5,12 +5,14 @@ const { GoogleGenAI } = require('@google/genai');
 
 dotenv.config();
 const app = express();
-const PORT = 5000;
+
+// 🛠️ FIX 1: Online servers (Render) ke mutabiq Port set kiya
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 
-// 🔑 Array of API Keys (Environment Variables se load hongi)
+// 🔑 Array of API Keys
 const apiKeys = [
     process.env.GEMINI_API_KEY_1,
     process.env.GEMINI_API_KEY_2,
@@ -18,20 +20,18 @@ const apiKeys = [
     process.env.GEMINI_API_KEY_4
 ];
 
-// Current working key ka track rakhne ke liye index counter
 let currentKeyIndex = 0;
 
-// Helper function: Jo active key ka GoogleGenAI instance bana kar dega
 function getAIInstance() {
-    // Agar teeno keys check ho chuki hain, toh wapas 0 par le aao (reset loop)
-    if (currentKeyIndex >= apiKeys.length) {
+    // 🛠️ FIX 2: Safely ensure index stays within bounds
+    if (currentKeyIndex >= apiKeys.length || currentKeyIndex < 0) {
         currentKeyIndex = 0; 
     }
     const activeKey = apiKeys[currentKeyIndex];
     return new GoogleGenAI({ apiKey: activeKey });
 }
 
-// 🧠 INJECTED BRAIN: Portfolio Rules & Knowledge Base (Unchanged)
+// 🧠 INJECTED BRAIN: Portfolio Rules & Knowledge Base (Bilkul Unchanged)
 const ariaSystemInstruction = 
 `You are Aria, the brilliant, confident, and highly skilled AI Voice & Chat Assistant of Amara. 
  Your job is to represent Amara to potential clients. You must strictly follow this master 
@@ -42,7 +42,7 @@ const ariaSystemInstruction =
      by Amara! She put an immense amount of hard work, dedication, and expertise into building me."
    - Always emphasize that Amara has a lot of experience and has built numerous advanced AI 
      projects, automated web agents, and stunning modern Web experiences. She is an expert 
-     in HTML5, CSS3, JavaScript, PaYthon, and AI automation.
+     in HTML5, CSS3, JavaScript, Python, and AI automation.
 
 2. Project Portfolio Showcase Rule:
    - If a client asks to see Amara's built projects (AI projects or past web designs), reply 
@@ -90,10 +90,9 @@ const ariaSystemInstruction =
    - Always maintain Aria's confident, helpful tone while sharing these details.`
 ;
 
-// 💬 1. CHAT MODE ROUTE (With Intelligent Auto-Switching Key Rotation)
+// 💬 1. CHAT MODE ROUTE
 app.post('/api/message', async (req, res) => {
     let attempts = 0;
-    // Loop chalega jab tak saari keys check nahi ho jatin (max 3 baar)
     while (attempts < apiKeys.length) {
         try {
             const ai = getAIInstance();
@@ -106,28 +105,24 @@ app.post('/api/message', async (req, res) => {
             });
             
             const replyText = response.text ? response.text : response.choices[0].message.content;
-            return res.json({ reply: replyText }); // Success! Response bhej diya
+            return res.json({ reply: replyText });
 
         } catch (error) {
             console.log(`⚠️ Key Slot [${currentKeyIndex + 1}] failed:`, error.message);
             
-            // Agar Quota/Limit ka error hai, toh next key par switch karein
             if (error.status === 429 || error.message.includes("quota")) {
-                currentKeyIndex++; // Index barha diya taake agli key select ho
+                currentKeyIndex++; 
                 attempts++;
                 console.log(`🔄 Quota full! Automatically switching to Key Slot [${currentKeyIndex + 1}]`);
             } else {
-                // Agar koi aur technical error hai, toh loop break kar ke error response dein
                 return res.json({ reply: "Aria is currently updating her database. Please try again in a few moments!" });
             }
         }
     }
-
-    // Agar saari keys ki limit khatam ho jaye toh yeh response jaye
     res.json({ reply: "Amara's portfolio is getting too much love right now! My AI core limit is reached for the hour, but you can directly drop her a message using the Contact Form below!" });
 });
 
-// 🎙️ 2. VOICE CALL MODE ROUTE (With Intelligent Auto-Switching Key Rotation)
+// 🎙️ 2. VOICE CALL MODE ROUTE
 app.post('/api/voice-agent', async (req, res) => {
     let attempts = 0;
     while (attempts < apiKeys.length) {
@@ -156,10 +151,10 @@ app.post('/api/voice-agent', async (req, res) => {
             }
         }
     }
-
     res.json({ reply: "My daily limit is full. Please message Amara via the contact form below!" });
 });
 
+// 🛠️ FIX 1 Continued: Listen using PORT variable
 app.listen(PORT, () => {
     console.log(`🚀 All-in-One Premium Server Active on Port ${PORT}`);
 });
