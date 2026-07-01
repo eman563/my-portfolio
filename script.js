@@ -256,8 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
             chatWindow.scrollTop = chatWindow.scrollHeight;
 
             try {
-                // LIVE VERCEL BACKEND LINK FOR CHAT
-                const response = await fetch('https://my-portfolio-gamma-nine-umqhavvc2.vercel.app/api/message', {
+                // LIVE UPDATED VERCEL BACKEND LINK FOR CHAT
+                const response = await fetch('https://my-portfolio-backend-smoky-ten.vercel.app/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: messageText })
@@ -376,11 +376,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (callLoadingDots) callLoadingDots.style.display = 'inline-flex';
 
             try {
-                // LIVE VERCEL BACKEND LINK FOR VOICE AGENT
-                const response = await fetch('https://my-portfolio-gamma-nine-umqhavvc2.vercel.app/api/voice-agent', {
+                // LIVE UPDATED VERCEL BACKEND LINK FOR VOICE AGENT
+                const response = await fetch('https://my-portfolio-backend-smoky-ten.vercel.app/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userText: finalTranscript })
+                    body: JSON.stringify({ message: finalTranscript })
                 });
 
                 const data = await response.json();
@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 🎙️ VOICE UTILITY ENGINE
+    // --- VOICE UTILITY ENGINE ---
     function speakOutLoud(message, onEndCallback) {
         window.speechSynthesis.cancel(); 
         isAriaSpeaking = true; 
